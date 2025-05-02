@@ -5,15 +5,21 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import { getCurrentUser } from "@/lib/actions/auth.action";
 
-const InterviewCard = ({
+const InterviewCard = async ({
   id,
   role,
   type,
   techstack,
   createdAt,
 }: InterviewCardProps) => {
-  const feedback = null as Feedback | null;
+  const user = await getCurrentUser();
+  const feedback = user?.id && id ? await getFeedbackByInterviewId({
+    interviewId: id,
+    userId: user.id,
+  }) : null;
   const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
