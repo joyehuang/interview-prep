@@ -4,6 +4,7 @@ import { feedbackSchema } from './../../constants/index';
 import { db } from "@/firebase/admin";
 import { google } from '@ai-sdk/google';
 import { generateObject } from "ai";
+import { getCurrentUser } from "../actions/auth.action";
 
 export async function getInterviewByUserId(userId: string): Promise<Interview[] | null> {
     const interviews = await db
@@ -115,4 +116,35 @@ export async function getFeedbackByInterviewId(params: GetFeedbackByInterviewIdP
     id: feedbackDoc.id,
     ...feedbackDoc.data(),
   } as Feedback;
+}
+
+export async function retakeInterview(originalInterviewId: string): Promise<{ success: boolean; newInterviewId?: string }>{
+  try {
+    const user = await getCurrentUser();
+    if (!user?.id) {
+      return { success: false };
+    }
+
+    const original = await getInterviewById(originalInterviewId);
+    if (!original) {
+      return { success: false };
+    }
+
+    const newInterview = {
+      role: original.role,
+      type: original.type,
+      level: original.level,
+      techstack: original.techstack,
+      questions: original.questions,
+      userId: user.id,
+      finalized: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    const docRef = await db.collection("interviews").add(newInterview);
+    return { success: true, newInterviewId: docRef.id };
+  } catch (error) {
+    console.error(error);
+    return { success: false };
+  }
 }

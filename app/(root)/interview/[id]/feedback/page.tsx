@@ -1,11 +1,13 @@
 import { getCurrentUser } from '@/lib/actions/auth.action';
 import { redirect } from 'next/navigation';
-import { getInterviewById, getFeedbackByInterviewId } from '@/lib/actions/general.action';
+import { getInterviewById, getFeedbackByInterviewId, retakeInterview } from '@/lib/actions/general.action';
 import React from 'react'
 import Image from 'next/image';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { Button } from '@/components/ui/button';
+
+
 
 const page = async ({ params }: RouteParams) => {
   const { id } = await params;
@@ -20,6 +22,15 @@ const page = async ({ params }: RouteParams) => {
     interviewId: id,
     userId: user?.id,
   });
+
+  async function retake() {
+    "use server";
+    const { success, newInterviewId } = await retakeInterview(id);
+    if (success && newInterviewId) {
+      redirect(`/interview/${newInterviewId}`);
+    }
+    redirect("/");
+  }
 
   return (
     <section className="section-feedback">
@@ -89,7 +100,7 @@ const page = async ({ params }: RouteParams) => {
     </div>
 
     <div className="buttons">
-      <Button className="btn-secondary flex-1">
+      <Button asChild className="btn-secondary flex-1">
         <Link href="/" className="flex w-full justify-center">
           <p className="text-sm font-semibold text-primary-200 text-center">
             Back to dashboard
@@ -97,18 +108,11 @@ const page = async ({ params }: RouteParams) => {
         </Link>
       </Button>
 
-      {/* TODO: implement retake interview feature */}
-      
-      <Button className="btn-primary flex-1">
-        <Link
-          href={`/interview/${id}`}
-          className="flex w-full justify-center"
-        >
-          <p className="text-sm font-semibold text-black text-center">
-            Retake Interview
-          </p>
-        </Link>
-      </Button>
+      <form action={retake} className="flex-1">
+        <Button className="btn-primary w-full" type="submit">
+          <p className="text-sm font-semibold text-black text-center">Retake Interview</p>
+        </Button>
+      </form>
     </div>
   </section>
   )
