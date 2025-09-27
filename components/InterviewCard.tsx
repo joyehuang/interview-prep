@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { getRandomInterviewCover } from "@/lib/utils";
+// import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 import { getCurrentUser } from "@/lib/actions/auth.action";
@@ -33,7 +33,7 @@ const InterviewCard = async ({
             <p className="badge-text">{normalizedType}</p>
           </div>
           <Image
-            src={getRandomInterviewCover()}
+            src="/covers/amazon.png"
             alt="interview-cover"
             width={90}
             height={90}

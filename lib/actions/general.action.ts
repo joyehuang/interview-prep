@@ -148,3 +148,11 @@ export async function retakeInterview(originalInterviewId: string): Promise<{ su
     return { success: false };
   }
 }
+
+export async function retake(id: string) {
+  const { success, newInterviewId } = await retakeInterview(id);
+  if (success && newInterviewId) {
+    return `/interview/${newInterviewId}`;
+  }
+  return "/";
+}

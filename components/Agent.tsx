@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { vapi } from "@/lib/vapi.sdk";
 import { interviewer } from "@/constants";
 import { createFeedback } from "@/lib/actions/general.action";
+import { Progress } from "@/components/ui/progress";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -134,6 +135,20 @@ const Agent = ({
   const isThisCallInactiveOrFinished =
     callStatus === CallStatus.INACTIVE || CallStatus.FINISHED;
 
+  const calculateProgressValue = () => {
+    if (!questions || questions.length === 0) return 0;
+    if (callStatus === CallStatus.INACTIVE) return 0;
+    if (callStatus === CallStatus.FINISHED) return 100;
+    
+    const averageTimePerMessage = 20;
+    const totalTime = questions.length * averageTimePerMessage;
+    const progress = (messages.length / totalTime) * 100;
+    
+    return Math.round(Math.min(progress, 90));
+  };
+
+  const progressValue = calculateProgressValue();
+
   return (
     <>
       <div className="call-view">
@@ -195,6 +210,7 @@ const Agent = ({
           </button>
         )}
       </div>
+      <Progress value={progressValue} />
     </>
   );
 };

@@ -66,6 +66,11 @@ export async function signIn(params: SignInParams) {
   }
 }
 
+export async function signOut() {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+}
+
 export async function setSessionCookie(idToken: string) {
   const ONE_WEEK = 60 * 60 * 24 * 7;
   const cookieStore = await cookies();
